@@ -2,6 +2,7 @@ import os
 import asyncio
 import audioop
 import traceback
+import discord
 
 from enum import Enum
 from array import array
@@ -102,6 +103,10 @@ class MusicPlayer(EventEmitter):
         self.state = MusicPlayerState.STOPPED
 
         self.loop.create_task(self.websocket_check())
+
+    async def on_message(message, client):
+        if message.content.startswith('!hello'):
+            await client.send_message(message.channel, 'Hello')
 
     @property
     def volume(self):

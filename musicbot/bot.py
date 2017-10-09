@@ -14,6 +14,7 @@ from discord.object import Object
 from discord.enums import ChannelType
 from discord.voice_client import VoiceClient
 from discord.ext.commands.bot import _get_variable
+from discord.emoji import Emoji
 
 from io import BytesIO
 from functools import wraps
@@ -356,8 +357,8 @@ class MusicBot(discord.Client):
         if server.id not in self.players:
             if not create:
                 raise exceptions.CommandError(
-                    'The bot is not in a voice channel.  '
-                    'Use %ssummon to summon it to your voice channel.' % self.config.command_prefix)
+                    'Lida is not currently in a channel. '
+                    'Use %ssummon to summon her to your voice channel.' % self.config.command_prefix)
 
             voice_client = await self.get_voice_client(channel)
 
@@ -464,7 +465,7 @@ class MusicBot(discord.Client):
             name = u'{}{}'.format(prefix, entry.title)[:128]
             game = discord.Game(name=name)
 
-        await self.change_status(game)
+        await self.change_presence(game)
 
 
     async def safe_send_message(self, dest, content, *, tts=False, expire_in=0, also_delete=None, quiet=False):
@@ -593,7 +594,17 @@ class MusicBot(discord.Client):
             vc.main_ws = self.ws
 
     async def on_ready(self):
-        print('\rConnected!  Musicbot v%s\n' % BOTVERSION)
+
+        print('\n')
+
+        # Say hello
+        print('#################################################################################')
+        print('\r## Welcome to Lida!                                                            ##')
+        print('\r## Version: %s                                                              ##' % BOTVERSION)
+        print('\r## ----                                                                        ##')
+        print('\r## Lida is an advanced music bot developed by; Just Ash#8715.                  ##')
+        print('\r## It is based upon RhinoBot: https://github.com/Just-Some-Bots/MusicBot.      ##')
+        print('#################################################################################\n')
 
         if self.config.owner_id == self.user.id:
             raise exceptions.HelpfulError(
@@ -605,11 +616,11 @@ class MusicBot(discord.Client):
 
         self.init_ok = True
 
-        self.safe_print("Bot:   %s/%s#%s" % (self.user.id, self.user.name, self.user.discriminator))
+        self.safe_print("Bot:   %s / %s#%s" % (self.user.id, self.user.name, self.user.discriminator))
 
         owner = self._get_owner(voice=True) or self._get_owner()
         if owner and self.servers:
-            self.safe_print("Owner: %s/%s#%s\n" % (owner.id, owner.name, owner.discriminator))
+            self.safe_print("Owner: %s / %s#%s\n" % (owner.id, owner.name, owner.discriminator))
 
             print('Server List:')
             [self.safe_print(' - ' + s.name) for s in self.servers]
@@ -686,9 +697,8 @@ class MusicBot(discord.Client):
         print("  Auto-Pause: " + ['Disabled', 'Enabled'][self.config.auto_pause])
         print("  Delete Messages: " + ['Disabled', 'Enabled'][self.config.delete_messages])
         if self.config.delete_messages:
-            print("    Delete Invoking: " + ['Disabled', 'Enabled'][self.config.delete_invoking])
+            print("  Delete Invoking: " + ['Disabled', 'Enabled'][self.config.delete_invoking])
         print("  Debug Mode: " + ['Disabled', 'Enabled'][self.config.debug_mode])
-        print("  Downloaded songs will be %s" % ['deleted', 'saved'][self.config.save_videos])
         print()
 
         # maybe option to leave the ownerid blank and generate a random command for the owner to use
@@ -704,7 +714,7 @@ class MusicBot(discord.Client):
             await self._autojoin_channels(autojoin_channels)
 
         elif self.config.auto_summon:
-            print("Attempting to autosummon...", flush=True)
+            'print("Attempting to autosummon...", flush=True)'
 
             # waitfor + get value
             owner_vc = await self._auto_summon()
@@ -715,9 +725,10 @@ class MusicBot(discord.Client):
                     print("Starting auto-playlist")
                     await self.on_player_finished_playing(await self.get_player(owner_vc))
             else:
-                print("Owner not found in a voice channel, could not autosummon.")
+                'print("Owner not found in a voice channel, could not autosummon.")'
 
-        print()
+        print('Lida is ready!\n')
+        print('---\n')
         # t-t-th-th-that's all folks!
 
     async def cmd_help(self, command=None):
@@ -744,7 +755,7 @@ class MusicBot(discord.Client):
                 return Response("No such command", delete_after=10)
 
         else:
-            helpmsg = "**Commands**\n```"
+            helpmsg = "here are the commands available to you!\n```"
             commands = []
 
             for att in dir(self):
@@ -752,15 +763,35 @@ class MusicBot(discord.Client):
                     command_name = att.replace('cmd_', '').lower()
                     commands.append("{}{}".format(self.config.command_prefix, command_name))
 
-            helpmsg += ", ".join(commands)
+            helpmsg += "\n".join(commands)
             helpmsg += "```"
-            helpmsg += "https://github.com/SexualRhinoceros/MusicBot/wiki/Commands-list"
 
             return Response(helpmsg, reply=True, delete_after=60)
 
-    async def cmd_blacklist(self, message, user_mentions, option, something):
+    async def cmd_info(self, message):
         """
         Usage:
+            {command_prefix}info
+
+        Prints an embedded message displaying information about Lida.
+        """
+
+        if message.content.startswith('!info'):
+
+            embed = discord.Embed(title="Lida", description="If it's not Lida, it's trash.", color=0x369167)
+            embed.set_thumbnail(url='https://i.shikashi.me/ZVp1K')
+
+            embed.add_field(name="Developer(s)", value="Just Ash#8715", inline=True)
+            embed.add_field(name="Contributor(s)", value="Mai - Alaitheen#9612", inline=True)
+            embed.add_field(name="GitHub", value="https://github.com/ash123456789/MusicBot", inline=False)
+
+            embed.set_footer(text="Version: %s" % BOTVERSION)
+
+            await self.send_message(message.channel, embed=embed)
+
+    async def cmd_blacklist(self, message, user_mentions, option, something):
+        """
+        Usage:!
             {command_prefix}blacklist [ + | - | add | remove ] @UserName [@UserName2 ...]
 
         Add or remove users to the blacklist.
@@ -1471,7 +1502,7 @@ class MusicBot(discord.Client):
         """
 
         if not new_volume:
-            return Response('Current volume: `%s%%`' % int(player.volume * 100), reply=True, delete_after=20)
+            return Response('Current volume: `%s%%`' % int(player.volume * 100), reply=True, delete_after=40)
 
         relative = False
         if new_volume[0] in '+-':
@@ -1481,7 +1512,7 @@ class MusicBot(discord.Client):
             new_volume = int(new_volume)
 
         except ValueError:
-            raise exceptions.CommandError('{} is not a valid number'.format(new_volume), expire_in=20)
+            raise exceptions.CommandError('{} is not a valid number'.format(new_volume), expire_in=40)
 
         if relative:
             vol_change = new_volume
@@ -1492,16 +1523,16 @@ class MusicBot(discord.Client):
         if 0 < new_volume <= 100:
             player.volume = new_volume / 100.0
 
-            return Response('updated volume from %d to %d' % (old_volume, new_volume), reply=True, delete_after=20)
+            return Response('updated volume from %d to %d' % (old_volume, new_volume), reply=True, delete_after=40)
 
         else:
             if relative:
                 raise exceptions.CommandError(
                     'Unreasonable volume change provided: {}{:+} -> {}%.  Provide a change between {} and {:+}.'.format(
-                        old_volume, vol_change, old_volume + vol_change, 1 - old_volume, 100 - old_volume), expire_in=20)
+                        old_volume, vol_change, old_volume + vol_change, 1 - old_volume, 100 - old_volume), expire_in=40)
             else:
                 raise exceptions.CommandError(
-                    'Unreasonable volume provided: {}%. Provide a value between 1 and 100.'.format(new_volume), expire_in=20)
+                    'Unreasonable volume provided: {}%. Provide a value between 1 and 100.'.format(new_volume), expire_in=40)
 
     async def cmd_queue(self, channel, player):
         """
@@ -1549,7 +1580,7 @@ class MusicBot(discord.Client):
                 'There are no songs queued! Queue something with {}play.'.format(self.config.command_prefix))
 
         message = '\n'.join(lines)
-        return Response(message, delete_after=30)
+        return Response(message, delete_after=120)
 
     async def cmd_clean(self, message, channel, server, author, search_range=50):
         """
@@ -1839,11 +1870,11 @@ class MusicBot(discord.Client):
                 return
 
         if message.author.id in self.blacklist and message.author.id != self.config.owner_id:
-            self.safe_print("[User blacklisted] {0.id}/{0.name} ({1})".format(message.author, message_content))
+            self.safe_print("[User blacklisted] {0.id} / {0.name} ({1})".format(message.author, message_content))
             return
 
         else:
-            self.safe_print("[Command] {0.id}/{0.name} ({1})".format(message.author, message_content))
+            self.safe_print("[Command] {0.id} / {0.name} ({1})".format(message.author, message_content))
 
         user_permissions = self.permissions.for_user(message.author)
 

@@ -140,7 +140,7 @@ def main():
 
                 os.execlp(pycom, pycom, 'run.py')
 
-        print("Please run the bot using python 3.5")
+        print("Please run the bot using python 3.5 or above")
         input("Press enter to continue . . .")
 
         return
@@ -161,7 +161,7 @@ def main():
         try:
             from musicbot import MusicBot
             m = MusicBot()
-            print("Connecting...", end='', flush=True)
+            print("Launching Lida...", end='', flush=True)
             m.run()
 
         except SyntaxError:
