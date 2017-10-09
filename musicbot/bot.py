@@ -8,6 +8,7 @@ import aiohttp
 import discord
 import asyncio
 import traceback
+import random
 
 from discord import utils
 from discord.object import Object
@@ -788,6 +789,34 @@ class MusicBot(discord.Client):
             embed.set_footer(text="Version: %s" % BOTVERSION)
 
             await self.send_message(message.channel, embed=embed)
+
+    async def cmd_lida(self, message):
+        """
+        Usage:
+            {command_prefix}lida
+
+        Displays a random picture of Lida.
+        """
+
+        lidaPictures = [
+            'https://i.shikashi.me/bE0Ze',
+            'https://i.shikashi.me/0L6vY',
+            'https://i.shikashi.me/m3DNe',
+            'https://i.shikashi.me/g98VR',
+            'https://i.shikashi.me/ymaoE',
+            'https://i.shikashi.me/E7JAO',
+            'https://i.shikashi.me/92ROk',
+            'https://i.shikashi.me/8R6jA',
+            'https://i.shikashi.me/Wjq2J',
+            'https://i.shikashi.me/RMml2',
+            'https://i.shikashi.me/KeqLl',
+            'https://i.shikashi.me/qDLk3',
+            'https://i.shikashi.me/aL1om',
+            'https://i.shikashi.me/4Eq3x',
+            'https://i.shikashi.me/5ER5M',
+        ]
+
+        return Response(random.choice(lidaPictures))
 
     async def cmd_blacklist(self, message, user_mentions, option, something):
         """
