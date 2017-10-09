@@ -12,10 +12,10 @@ class Config:
         config = configparser.ConfigParser()
 
         if not config.read(config_file, encoding='utf-8'):
-            print('[config] Config file not found, copying example_options.ini')
+            print('[config] Config file not found, copying options.ini')
 
             try:
-                shutil.copy('config/example_options.ini', config_file)
+                shutil.copy('config/options.ini', config_file)
 
                 # load the config again and check to see if the user edited that one
                 c = configparser.ConfigParser()
@@ -27,7 +27,7 @@ class Config:
 
             except FileNotFoundError as e:
                 raise HelpfulError(
-                    "Your config files are missing.  Neither options.ini nor example_options.ini were found.",
+                    "Your config files are missing.  Neither options.ini nor options.ini were found.",
                     "Grab the files back from the archive or remake them yourself and copy paste the content "
                     "from the repo.  Stop removing important files!"
                 )
@@ -39,7 +39,7 @@ class Config:
 
             except Exception as e:
                 print(e)
-                print("\nUnable to copy config/example_options.ini to %s" % config_file, flush=True)
+                print("\nUnable to copy config/options.ini to %s" % config_file, flush=True)
                 os._exit(2)
 
         config = configparser.ConfigParser(interpolation=None)
