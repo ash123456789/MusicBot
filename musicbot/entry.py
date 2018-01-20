@@ -209,14 +209,18 @@ class URLPlaylistEntry(BasePlaylistEntry):
     async def _really_download(self, *, hash=False):
         print("[Download] Started:", self.url)
 
-        try:
-            result = await self.playlist.downloader.extract_info(self.playlist.loop, self.url, download=True)
-        except Exception as e:
-            raise ExtractionError(e)
+        retry = True
+        while retry:
+            try:
+                result = await self.playlist.downloader.extract_info(self.playlist.loop, self.url, download=True)
+                break
+            except Exception as e:
+                raise ExtractionError(e)
 
-        print("[Download] Complete:", self.url)
+        print("Download complete: {}".format(self.url))
 
         if result is None:
+            log.critical("YTDL has failed, everyone panic")
             raise ExtractionError("ytdl broke and hell if I know why")
             # What the fuck do I do now?
 
