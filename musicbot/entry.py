@@ -207,7 +207,7 @@ class URLPlaylistEntry(BasePlaylistEntry):
 
     # noinspection PyShadowingBuiltins
     async def _really_download(self, *, hash=False):
-        print("[Download] Started:", self.url)
+        print("Download Started:", self.url)
 
         retry = True
         while retry:
@@ -220,7 +220,6 @@ class URLPlaylistEntry(BasePlaylistEntry):
         print("Download complete: {}".format(self.url))
 
         if result is None:
-            log.critical("YTDL has failed, everyone panic")
             raise ExtractionError("ytdl broke and hell if I know why")
             # What the fuck do I do now?
 
